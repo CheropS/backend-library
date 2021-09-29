@@ -91,3 +91,62 @@ class User(db.Model):
     def __repr__(self):
         return "User: {}".format(self.username)
 
+
+@dataclass
+class Book(db.Model):
+    """Book Model"""
+    # Ensure table name is in plural
+    __tablename__ = 'books'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(500), index=True)
+    author = db.Column(db.String(100), index=True)
+    isbn = db.Column(db.String(100), index=True, unique=True)
+    publisher = db.Column(db.String(100), index=True)
+    quantity = db.Column(db.Integer)
+    availability = False
+    created = db.Column(db.Date, default=datetime.today())
+    reviewers = db.relationship(
+        'User', secondary='reviewed_books', lazy='dynamic')
+
+    @staticmethod
+    def get_all_books():
+        """Gets all book"""
+        return Book.query.all()
+
+    @staticmethod
+    def get_book_by_id(id):
+        """Gets book by id"""
+        return Book.query.filter_by(id=id).first()
+
+    @staticmethod
+    def search(q):
+        books = Book.query.filter(
+            or_(Book.title.like('%'+q.title()+'%'))).all()
+        return {"Books": [book.serialize for book in books]}
+
+    @property
+    def serialize(self):
+        """Serializes book information"""
+        self.availability = self.quantity != 0
+        return {
+            "id": self.id,
+            "title": self.title,
+            "author": self.author,
+            "isbn": self.isbn,
+            "publisher": self.publisher,
+            "availability": self.availability,
+            "quantity": self.quantity
+        }
+
+    def save(self):
+        """Saves book object to database"""
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        """Deletes book object"""
+        db.session.delete(self)
+        db.session.commit()
+
+    def __repr__(self):
+        return "Book: {}".format(self.title)
