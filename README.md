@@ -26,7 +26,7 @@ Flask Api endpoints and tests for the library project.
 1. Clone the GitHub repository
 
     ```shell
-    git clone https://github.com/CheropS/the-library
+    git clone https://github.com/CheropS/backend-library
     ```
 
 2. Change into the folder
