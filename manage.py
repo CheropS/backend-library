@@ -1,6 +1,6 @@
 """Manage file"""
 from flask import render_template
-from flask_migrate import Migrate, MigrateCommand
+from flask_migrate import Migrate
 
 from api import db, app
 from api import routes
