@@ -45,7 +45,7 @@ class ReviewOps(Resource):
 
     @jwt_required
     def post(self, book_id):
-        """Function serving borrow book api endpoint"""
+        """Function serving review book api endpoint"""
         current_user = get_jwt_identity()
         user = User.get_user_by_username(current_user)
         if user:
@@ -55,8 +55,8 @@ class ReviewOps(Resource):
             if book:
                 if book.quantity == 0:
                     return Response(json.dumps({"Message": "Book not available to review"}), status=404)
-                borrowed = ReviewBook.query.filter_by(user_id=user.id, book_id=book.id, returned=False).first()
-                if borrowed:
+                reviewed = ReviewBook.query.filter_by(user_id=user.id, book_id=book.id, reviewed=False).first()
+                if reviewed:
                     return Response(json.dumps({"Message": "Already reviewed book"}), status=403)
                 ReviewBook(user=user, book=book).save()
                 book.quantity -= 1
@@ -75,14 +75,37 @@ class ReviewOps(Resource):
                 return Response(json.dumps(validate_book(book_id)), status=403)
             book = Book.get_book_by_id(book_id)
             if book:
-                to_return = ReviewBook.query.filter_by(user_id=user.id, book_id=book.id, returned=False).first()
+                to_return = ReviewBook.query.filter_by(user_id=user.id, book_id=book.id, reviewed=False).first()
                 if to_return:
-                    to_return.returned = True
-                    to_return.date_returned = datetime.now()
+                    to_return.reviewed = True
+                    to_return.date_reviewed = datetime.now()
                     to_return.save()
                     book.quantity += 1
                     book.save()
                     return Response(json.dumps({"Message": "Book reviewed successfully"}), status=200)
                 return Response(json.dumps({"Message": "You had not reviewed this book"}), status=403)
             return Response(json.dumps({"Message": "Book does not exist"}), status=404)
+        return Response(json.dumps({"Message": "User does not exist"}), status=404)
+
+
+class ReviewHistory(Resource):
+    """Reviewing History api endpoint resource"""
+
+    @jwt_required
+    def get(self):
+        """Function serving get user reviewing history api endpoint"""
+        current_user = get_jwt_identity()
+        user = User.get_user_by_username(current_user)
+        if user:
+            args = parser.parse_args()
+            reviewed = request.args.get('reviewed')
+            if reviewed == 'false':
+                unreviewed_books = ReviewBook.get_books_not_reviewed(user.id)
+                if unreviewed_books:
+                    return Response(json.dumps({"unreviewed": unreviewed_books}), status=200)
+                return Response(json.dumps({"Message": "You do not have any unreviewed book"}), status=403)
+            review_history = ReviewBook.get_user_review_history(user.id)
+            if review_history:
+                return Response(json.dumps({"ReviewHistory": review_history}), status=200)
+            return Response(json.dumps({"Message": "You have not reviewed any book"}), status=404)
         return Response(json.dumps({"Message": "User does not exist"}), status=404)
