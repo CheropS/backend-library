@@ -74,7 +74,5 @@ jobs:
         export TEST_SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://${{ matrix.database-user }}:${{ matrix.database-password }}@${{ matrix.database-host }}:${{ matrix.database-port }}/${{ matrix.database-name }}
         export SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://${{ matrix.database-user }}:${{ matrix.database-password }}@${{ matrix.database-host }}:${{ matrix.database-port }}/${{ matrix.database-name }}
         export FLASK_APP=manage.py
-        flask db migrate
-        flask upgrade
         flask tests
 
