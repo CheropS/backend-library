@@ -208,11 +208,11 @@ class ReviewBook(db.Model):
         for book in user_books:
             try:
                 single_book = Book.get_book_by_id(book.book_id)
-                book_details["id"] = singleBook.id
-                book_details["title"] = singleBook.title
-                book_details["author"] = singleBook.author
-                book_details["isbn"] = singleBook.isbn
-                book_details["borrowDate"] = book.date_reviewed
+                book_details["id"] = single_book.id
+                book_details["title"] = single_book.title
+                book_details["author"] = single_book.author
+                book_details["isbn"] = single_book.isbn
+                book_details["reviewDate"] = book.date_reviewed
                 book_details["dueDate"] = book.date_due
             except Exception as e:
                 print(f'error {e}')
