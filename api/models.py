@@ -121,7 +121,7 @@ class Book(db.Model):
     @staticmethod
     def search(q):
         books = Book.query.filter(
-            or_(Book.title.like('%'+q.title()+'%'))).all()
+            or_(Book.title.like('%' + q.title() + '%'))).all()
         return {"Books": [book.serialize for book in books]}
 
     @property
@@ -150,3 +150,129 @@ class Book(db.Model):
 
     def __repr__(self):
         return "Book: {}".format(self.title)
+
+
+class ReviewBook(db.Model):
+    """Association Table"""
+    __tablename__ = "reviewed_books"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    book_id = db.Column(db.Integer, db.ForeignKey('books.id'))
+    date_reviewed = db.Column(db.Date, default=datetime.today())
+    date_of_review = db.Column(db.Date, default=datetime.today() + timedelta(days=30), nullable=True)
+    reviewed = db.Column(db.Boolean, default=False)
+    user = db.relationship(User, backref='book')
+    book = db.relationship(Book, backref='user')
+
+    @staticmethod
+    def get_all_reviewed_books():
+        """Gets all books in review table"""
+        return ReviewBook.query.all()
+
+    @staticmethod
+    def get_user_review_history(user_id):
+        """ Gets user review history"""
+        reviewed_books = ReviewBook.get_all_reviewed_books()
+        user_books = [
+            book for book in reviewed_books if book.user_id == user_id]
+        review_history = []
+        book_details = {}
+        for book in user_books:
+            try:
+                single_book = Book.get_book_by_id(book.book_id)
+                book_details["id"] = single_book.id
+                book_details["title"] = single_book.title
+                book_details["author"] = single_book.author
+                book_details["isbn"] = single_book.isbn
+                book_details["review_date"] = book.date_reviewed
+                if book.reviewed:
+                    book_details["reviewed_date"] = book.date_reviewed
+                else:
+                    book_details["review_date"] = book.date_of_review
+            except Exception as e:
+                print(e)
+            finally:
+                review_history.append(book_details)
+                book_details = {}
+        return review_history
+
+    @staticmethod
+    def get_books_not_reviewed(user_id):
+        """Gets books not reviewed by user"""
+        reviewed_books = ReviewBook.get_all_reviewed_books()
+        # User non reviewed books
+        user_books = [book for book in reviewed_books if book.user_id ==
+                      user_id and book.returned == False]
+        unreviewed_books = []
+        book_details = {}
+        for book in user_books:
+            try:
+                single_book = Book.get_book_by_id(book.book_id)
+                book_details["id"] = singleBook.id
+                book_details["title"] = singleBook.title
+                book_details["author"] = singleBook.author
+                book_details["isbn"] = singleBook.isbn
+                book_details["borrowDate"] = book.date_reviewed
+                book_details["dueDate"] = book.date_due
+            except Exception as e:
+                print(f'error {e}')
+            finally:
+                unreviewed_books.append(book_details)
+                book_details = {}
+        return unreviewed_books
+
+    def save(self):
+        """Saved book reviewed to database"""
+        db.session.add(self)
+        db.session.commit()
+
+
+@dataclass
+class Token(db.Model):
+    """Token Model"""
+    __tablename__ = 'tokens'
+
+    id = db.Column(db.Integer, primary_key=True)
+    token = db.Column(db.String(1000), index=True, unique=True)
+    owner = db.Column(db.String(60))
+    created = db.Column(db.DateTime, default=datetime.today())
+
+    @staticmethod
+    def all_tokens():
+        """Gets all tokens"""
+        return Token.query.all()
+
+    @staticmethod
+    def token_by_owner(username):
+        """Gets token by user's username"""
+        return Token.query.filter_by(owner=username).first()
+
+    def save(self):
+        """Saves generated token to database."""
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        """Delete token after being revoked"""
+        db.session.delete(self)
+        db.session.commit()
+
+
+@dataclass
+class Revoked(db.Model):
+    """Revoked Token Table"""
+
+    __tablename__ = 'revoked'
+    id = db.Column(db.Integer, primary_key=True)
+    token = db.Column(db.String(1000), index=True)
+    date_revoked = db.Column(db.DateTime, default=datetime.now())
+
+    @staticmethod
+    def is_blacklisted(token):
+        """Checks if token is revoked"""
+        return bool(Revoked.query.filter_by(token=token).first())
+
+    def save(self):
+        """Saves revoked token to database"""
+        db.session.add(self)
+        db.session.commit()
