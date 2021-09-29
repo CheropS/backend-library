@@ -72,6 +72,7 @@ jobs:
         POSTGRES_DB: ${{ matrix.database-name }}
       run: |
         export TEST_SQLALCHEMY_DATABASE_URI=postgresql+psycopg2:/DATABASE_USER:DATABASE_PASSWORD@DATABASE_HOST:DATABASE_PORT/POSTGRES_DB
+        export FLASK_APP=manage.py
         flask db init
         flask db migrate
         flask upgrade
