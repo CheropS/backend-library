@@ -7,7 +7,7 @@ from flask import json
 
 
 class TestHelloBooks(unittest.TestCase):
-    """Hello Books Test Base Class"""
+    """ Books Test Base Class"""
 
     def setUp(self):
         """Set up function before any test runs"""
@@ -247,11 +247,11 @@ class TestHelloBooks(unittest.TestCase):
             "publisher": "Publisher",
             "quantity": None
         }
-        admin = User('dmwangi@gmail.com', 'dmwangi', 'David', 'Mwangi', 'password1234')
+        admin = User('kemwaura@gmail.com', 'zooken', 'Ken', 'Mwaura', 'password1234')
         admin.is_admin = True
         admin.save()
         self.admin_data = {
-            "username": "dmwangi",
+            "username": "zooken",
             "password": "password1234",
         }
 

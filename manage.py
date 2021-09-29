@@ -40,5 +40,16 @@ def create_admin():
     print('Admin user created successfully')
 
 
+@app.cli.command("tests")
+def test():
+    """
+    function to run tests
+    :return: tests passed
+    """
+    import unittest
+    tests = unittest.TestLoader().discover('tests')
+    unittest.TextTestRunner(verbosity=2).run(tests)
+
+
 if __name__ == '__main__':
-    manager.run()
+    app.run()
