@@ -1,5 +1,5 @@
 # backend-library
-Flask Api for the library project.
+Flask Api endpoints and tests for the library project.
 
 ## Project Objectives
 * Your project should have a functioning authentication system
