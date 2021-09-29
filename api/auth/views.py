@@ -26,7 +26,8 @@ class Register(Resource):
         username = [user for user in users if user.username == data['username']]
         if username:
             return Response(json.dumps({"Message":"Username provided already exists"}), status=409)
-        User(data['email'], data['username'], data['first_name'], data['last_name'], data['password']).save()
+        new_user = User(data['email'], data['username'], data['first_name'], data['last_name'], data['password'])
+        new_user.save()
         return Response(json.dumps({"Message": "User Created Successfully"}), status=201)
 
 
@@ -40,8 +41,9 @@ class Login(Resource):
         if validate_login(data):
             return Response(json.dumps(validate_login(data)), status=400)
         user = User.query.filter_by(username=data['username']).first()
+        print(user)
         if user:
-            if User.verify_password(user.password_hash, data['password']):
+            if User.verify_password(user.secure_password, data['password']):
                 logged_in = Token.token_by_owner(user.username)
                 # if logged_in:
                 #     return Response(json.dumps({"Message": "Already logged in", "Token": logged_in.token}), status=403)

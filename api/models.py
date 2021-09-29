@@ -21,6 +21,14 @@ class User(db.Model):
     reviewed_books = db.relationship(
         'Book', secondary='reviewed_books', lazy='dynamic')
 
+    def __init__(self, email, username, first_name, last_name, password):
+        """Init function"""
+        self.email = email
+        self.username = username
+        self.first_name = first_name
+        self.last_name = last_name
+        self.secure_password = self.hash_password(password)
+
     @property
     def password(self):
         raise AttributeError("You cannot read password attribute")
@@ -30,14 +38,14 @@ class User(db.Model):
         self.secure_password = generate_password_hash(password)
 
     @staticmethod
-    def hash_password(password):
+    def hash_password(password1):
         """Hashes user password"""
-        return generate_password_hash(password)
+        return generate_password_hash(password1)
 
     @staticmethod
-    def verify_password(saved_password, password):
+    def verify_password(saved_password, password1):
         """Check is password hash matches actual password"""
-        return check_password_hash(saved_password, password)
+        return check_password_hash(saved_password, password1)
 
     def save(self):
         """Saves user objects to database"""
@@ -108,6 +116,13 @@ class Book(db.Model):
     reviewers = db.relationship(
         'User', secondary='reviewed_books', lazy='dynamic')
 
+    def __init__(self, title, author, isbn, publisher, quantity):
+        """Init function"""
+        self.title = title
+        self.author = author
+        self.isbn = isbn
+        self.publisher = publisher
+        self.quantity = quantity
     @staticmethod
     def get_all_books():
         """Gets all book"""
@@ -237,6 +252,12 @@ class Token(db.Model):
     owner = db.Column(db.String(60))
     created = db.Column(db.DateTime, default=datetime.today())
 
+    def __init__(self, token, owner):
+        """Init function"""
+        self.token = token
+        self.owner = owner
+
+
     @staticmethod
     def all_tokens():
         """Gets all tokens"""
@@ -266,6 +287,10 @@ class Revoked(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     token = db.Column(db.String(1000), index=True)
     date_revoked = db.Column(db.DateTime, default=datetime.now())
+
+    def __init__(self, token):
+        """Init function"""
+        self.token = token
 
     @staticmethod
     def is_blacklisted(token):
