@@ -1,4 +1,5 @@
 """Manage file"""
+from flask import render_template
 from flask_migrate import Migrate, MigrateCommand
 
 from api import db, app
@@ -9,9 +10,18 @@ app.register_blueprint(routes.mod)
 
 migrate = Migrate(app, db)
 
+
+# Route to Index Page
+@app.route('/')
+def index():
+    """Route to Index Page"""
+    return render_template('documentation.html')
+
+
 @app.cli.command("db")
 def db():
     """command to migrate"""
+
 
 @app.cli.command("create_admin")
 def create_admin():
@@ -28,6 +38,7 @@ def create_admin():
     except Exception as e:
         print(e)
     print('Admin user created successfully')
+
 
 if __name__ == '__main__':
     manager.run()
