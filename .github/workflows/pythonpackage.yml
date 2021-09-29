@@ -71,7 +71,7 @@ jobs:
         DATABASE_PORT: ${{ matrix.database-port }}
         POSTGRES_DB: ${{ matrix.database-name }}
       run: |
-        export TEST_SQLALCHEMY_DATABASE_URI=postgresql+psycopg2:/DATABASE_USER:DATABASE_PASSWORD@DATABASE_HOST:DATABASE_PORT/POSTGRES_DB
+        export TEST_SQLALCHEMY_DATABASE_URI=postgresql+psycopg2:/${{ matrix.database-user }}:${{ matrix.database-password }}@${{ matrix.database-host }}:${{ matrix.database-port }}/${{ matrix.database-name }}
         export SQLALCHEMY_DATABASE_URI=postgresql+psycopg2:/DATABASE_USER:DATABASE_PASSWORD@DATABASE_HOST:DATABASE_PORT/POSTGRES_DB
         export FLASK_APP=manage.py
         flask db migrate
