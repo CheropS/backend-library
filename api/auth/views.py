@@ -90,7 +90,7 @@ class ResetPassword(Resource):
                     current_user.password_hash = current_user.hash_password(data['new_password'])
                     current_user.save()
 
-                except:
+                except Exception as e:
                     pass
                 finally:
                     # Revoke token after password change
