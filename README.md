@@ -135,6 +135,7 @@ Flask Api endpoints and tests for the library project.
 | PUT /api/v1/books/<string:bookId> | Edits Individual Book Info
 | DELETE /api/v1/books/<string:bookId> | Deletes A Book
 | GET /api/v1/books | Retrieves All Books
+| GET /api/v1/books?q | Search All Books
 | GET /api/v1/books/<string: bookId> | Get Book by id
 | POST /api/v1/users/books/<string: bookId> | Review a book
 | POST /api/v1/auth/register | Register a New User

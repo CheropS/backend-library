@@ -12,6 +12,7 @@ class GetBooks(Resource):
     def get(self):
         """Function serving get all books api endpoint"""
         q = request.args.get("q")
+        print(q)
         if q:
             return Response(json.dumps(Book.search(q)), status=200)
         page = request.args.get("page")

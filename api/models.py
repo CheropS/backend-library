@@ -135,8 +135,7 @@ class Book(db.Model):
 
     @staticmethod
     def search(q):
-        books = Book.query.filter(
-            or_(Book.title.like('%' + q.title() + '%'))).all()
+        books = Book.query.filter_by(title=q).all()
         return {"Books": [book.serialize for book in books]}
 
     @property
