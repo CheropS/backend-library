@@ -9,7 +9,7 @@ app = Flask('__name__')
 
 CORS(app)
 jwt = JWTManager(app)
-app.config.from_object(app_config['development'])
+app.config.from_object(app_config['production'])
 app.url_map.strict_slashes = False
 
 db = SQLAlchemy(app)
