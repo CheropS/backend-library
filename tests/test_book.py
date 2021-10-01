@@ -23,7 +23,7 @@ class BookTestCase(TestHelloBooks):
 
     def test_add_book(self):
         """Tests add book api endpoint"""
-        empty_book =self.add_book(self.empty_book_data)
+        empty_book = self.add_book(self.empty_book_data)
         self.assertEqual(empty_book.status_code, 400)
         no_title = self.add_book(self.book_data_no_title)
         self.assertEqual(no_title.status_code, 400)
